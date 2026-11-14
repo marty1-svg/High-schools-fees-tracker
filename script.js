@@ -228,6 +228,155 @@ navigationLinks.forEach(function(link) {
     });
 
 });
+// ==================================
+// PARENT MANAGEMENT
+// ==================================
+
+const parentForm = document.getElementById("parentForm");
+const parentTableBody = document.getElementById("parentTableBody");
+const parentSearch = document.getElementById("parentSearch");
+
+let parents = JSON.parse(
+    localStorage.getItem("schoolParents") || "[]"
+);
+
+
+// Save parents
+
+function saveParents() {
+
+    localStorage.setItem(
+        "schoolParents",
+        JSON.stringify(parents)
+    );
+
+}
+
+
+// Display parents
+
+function displayParents(searchTerm = "") {
+
+    parentTableBody.innerHTML = "";
+
+    const filteredParents = parents.filter(function(parent) {
+
+        return (
+            parent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            parent.parentId.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+    });
+
+    filteredParents.forEach(function(parent) {
+
+        const row = document.createElement("tr");
+
+        const values = [
+            parent.parentId,
+            parent.name,
+            parent.phone,
+            parent.email,
+            parent.address
+        ];
+
+        values.forEach(function(value) {
+
+            const cell = document.createElement("td");
+            cell.textContent = value || "-";
+            row.appendChild(cell);
+
+        });
+
+        const actionCell = document.createElement("td");
+        const deleteButton = document.createElement("button");
+
+        deleteButton.textContent = "Delete";
+        deleteButton.className = "delete-btn";
+
+        deleteButton.addEventListener("click", function() {
+
+            if (!confirm("Delete this parent record?")) return;
+
+            parents = parents.filter(function(item) {
+                return item.parentId !== parent.parentId;
+            });
+
+            saveParents();
+            displayParents(parentSearch.value);
+
+        });
+
+        actionCell.appendChild(deleteButton);
+        row.appendChild(actionCell);
+
+        parentTableBody.appendChild(row);
+
+    });
+
+    document.getElementById("parentCount").textContent =
+        filteredParents.length + " parent(s) displayed.";
+
+}
+
+
+// Register parent
+
+parentForm.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const parent = {
+
+        parentId: document.getElementById("parentId").value.trim(),
+
+        name: document.getElementById("parentName").value.trim(),
+
+        phone: document.getElementById("parentPhone").value.trim(),
+
+        email: document.getElementById("parentEmail").value.trim(),
+
+        address: document.getElementById("parentAddress").value.trim()
+
+    };
+
+    const exists = parents.some(function(item) {
+
+        return item.parentId.toLowerCase() ===
+            parent.parentId.toLowerCase();
+
+    });
+
+    if (exists) {
+        alert("This Parent ID already exists!");
+        return;
+    }
+
+    parents.push(parent);
+
+    saveParents();
+    displayParents();
+
+    parentForm.reset();
+
+    alert("Parent registered successfully!");
+
+});
+
+
+// Search parents
+
+parentSearch.addEventListener("input", function() {
+
+    displayParents(parentSearch.value);
+
+});
+
+
+// Load saved records
+
+displayParents();
+
 
 
 // 9. Logout placeholder
