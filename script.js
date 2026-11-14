@@ -1,69 +1,192 @@
 
+
 "use strict";
 
-// ===================================
+// ==================================
 // SCHOOL FEE TRACKER
-// Main JavaScript file
-// ===================================
+// STUDENT MANAGEMENT
+// ==================================
 
 
-// 1. Sample dashboard data
+// 1. Get HTML elements
 
-const schoolData = {
-    totalStudents: 1250,
-    expectedFees: 25000000,
-    feesCollected: 18000000,
-    outstandingFees: 7000000
-};
+const studentForm = document.getElementById("studentForm");
+const studentTableBody = document.getElementById("studentTableBody");
+const studentSearch = document.getElementById("studentSearch");
+const totalStudents = document.getElementById("totalStudents");
 
 
-// 2. Format money into Kenyan shillings
+// 2. Load saved student records
 
-function formatCurrency(amount) {
-    return new Intl.NumberFormat("en-KE", {
-        style: "currency",
-        currency: "KES",
-        maximumFractionDigits: 0
-    }).format(amount);
+let students = JSON.parse(
+    localStorage.getItem("schoolStudents") || "[]"
+);
+
+
+// 3. Save records in browser storage
+
+function saveStudents() {
+
+    localStorage.setItem(
+        "schoolStudents",
+        JSON.stringify(students)
+    );
+
 }
 
 
-// 3. Calculate outstanding fees
+// 4. Display students
 
-function calculateBalance(expected, paid) {
-    return expected - paid;
+function displayStudents(searchTerm = "") {
+
+    studentTableBody.innerHTML = "";
+
+    const filteredStudents = students.filter(function(student) {
+
+        return (
+            student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            student.admissionNo.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+    });
+
+    filteredStudents.forEach(function(student) {
+
+        const row = document.createElement("tr");
+
+        const values = [
+            student.admissionNo,
+            student.name,
+            student.studentClass,
+            student.stream,
+            student.guardian,
+            student.phone
+        ];
+
+        values.forEach(function(value) {
+
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+
+        });
+
+        const actionCell = document.createElement("td");
+
+        const deleteButton = document.createElement("button");
+
+        deleteButton.textContent = "Delete";
+        deleteButton.className = "delete-btn";
+
+        deleteButton.addEventListener("click", function() {
+
+            deleteStudent(student.admissionNo);
+
+        });
+
+        actionCell.appendChild(deleteButton);
+        row.appendChild(actionCell);
+
+        studentTableBody.appendChild(row);
+
+    });
+
+    totalStudents.textContent = students.length;
+
+    document.getElementById("studentCount").textContent =
+        filteredStudents.length + " student(s) displayed.";
+
 }
 
 
-// 4. Display dashboard information
+// 5. Register a student
 
-function displayDashboard() {
+studentForm.addEventListener("submit", function(event) {
 
-    console.log("School Fee Tracker Dashboard");
+    event.preventDefault();
 
-    console.log(
-        "Total Students:",
-        schoolData.totalStudents
+    const student = {
+
+        admissionNo: document.getElementById("admissionNo").value.trim(),
+
+        name: document.getElementById("studentName").value.trim(),
+
+        studentClass: document.getElementById("studentClass").value,
+
+        stream: document.getElementById("studentStream").value.trim(),
+
+        guardian: document.getElementById("guardianName").value.trim(),
+
+        phone: document.getElementById("guardianPhone").value.trim()
+
+    };
+
+
+    // Check duplicate admission numbers
+
+    const exists = students.some(function(item) {
+
+        return item.admissionNo.toLowerCase() ===
+            student.admissionNo.toLowerCase();
+
+    });
+
+    if (exists) {
+
+        alert("This admission number already exists!");
+        return;
+
+    }
+
+
+    // Add student
+
+    students.push(student);
+
+    saveStudents();
+
+    displayStudents();
+
+    studentForm.reset();
+
+    alert("Student registered successfully!");
+
+});
+
+
+// 6. Delete a student
+
+function deleteStudent(admissionNo) {
+
+    const confirmed = confirm(
+        "Are you sure you want to delete this student?"
     );
 
-    console.log(
-        "Expected Fees:",
-        formatCurrency(schoolData.expectedFees)
-    );
+    if (!confirmed) return;
 
-    console.log(
-        "Fees Collected:",
-        formatCurrency(schoolData.feesCollected)
-    );
+    students = students.filter(function(student) {
 
-    console.log(
-        "Outstanding Fees:",
-        formatCurrency(schoolData.outstandingFees)
-    );
+        return student.admissionNo !== admissionNo;
+
+    });
+
+    saveStudents();
+
+    displayStudents();
+
 }
 
 
-// 5. Navigation menu interaction
+// 7. Search students
+
+studentSearch.addEventListener("input", function() {
+
+    displayStudents(studentSearch.value);
+
+});
+
+
+// 8. Dashboard navigation
 
 const navigationLinks = document.querySelectorAll(
     ".sidebar nav a"
@@ -75,33 +198,50 @@ navigationLinks.forEach(function(link) {
 
         event.preventDefault();
 
+        const page = link.dataset.page;
+
+        if (!page) {
+
+            alert("This section will be developed next.");
+            return;
+
+        }
+
+        document.querySelectorAll(".page-section").forEach(
+            function(section) {
+
+                section.hidden = true;
+
+            }
+        );
+
+        document.getElementById(page + "-section").hidden = false;
+
         navigationLinks.forEach(function(item) {
+
             item.classList.remove("active");
+
         });
 
         link.classList.add("active");
-
-        console.log(
-            "Selected section:",
-            link.textContent
-        );
 
     });
 
 });
 
 
-// 6. Logout interaction
+// 9. Logout placeholder
 
-const logoutButton = document.querySelector(".logout");
+document.querySelector(".logout").addEventListener(
+    "click",
+    function() {
 
-logoutButton.addEventListener("click", function() {
+        alert("Login and logout security will be implemented later.");
 
-    alert("Logout functionality will be connected to authentication later.");
+    }
+);
 
-});
 
+// 10. Load existing records
 
-// 7. Run dashboard
-
-displayDashboard();
+displayStudents();
