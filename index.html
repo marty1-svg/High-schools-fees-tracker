@@ -73,6 +73,100 @@
         </section>
 
     </section>
+<!-- PARENTS MANAGEMENT SECTION -->
+
+<section id="parents-section" class="page-section" hidden>
+
+    <header class="topbar">
+        <div>
+            <h1>Parent Management</h1>
+            <p>Register and manage student guardians</p>
+        </div>
+        <div class="admin">Administrator</div>
+    </header>
+
+    <section class="student-form-section">
+
+        <h2>Register New Parent</h2>
+
+        <form id="parentForm">
+
+            <div class="form-grid">
+
+                <div>
+                    <label for="parentId">Parent ID</label>
+                    <input type="text" id="parentId"
+                        placeholder="e.g PAR001" required>
+                </div>
+
+                <div>
+                    <label for="parentName">Full Name</label>
+                    <input type="text" id="parentName"
+                        placeholder="Parent's full name" required>
+                </div>
+
+                <div>
+                    <label for="parentPhone">Phone Number</label>
+                    <input type="tel" id="parentPhone"
+                        placeholder="07XXXXXXXX" required>
+                </div>
+
+                <div>
+                    <label for="parentEmail">Email Address</label>
+                    <input type="email" id="parentEmail"
+                        placeholder="example@email.com">
+                </div>
+
+                <div>
+                    <label for="parentAddress">Home Address</label>
+                    <input type="text" id="parentAddress"
+                        placeholder="Enter home address">
+                </div>
+
+            </div>
+
+            <button type="submit" class="primary-btn">
+                Register Parent
+            </button>
+
+        </form>
+
+    </section>
+
+    <section class="table-section student-list">
+
+        <h2>Registered Parents</h2>
+
+        <input type="search"
+            id="parentSearch"
+            placeholder="Search parents...">
+
+        <div class="table-wrapper">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parent ID</th>
+                        <th>Full Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="parentTableBody"></tbody>
+
+            </table>
+
+        </div>
+
+        <p id="parentCount">No parents registered yet.</p>
+
+    </section>
+
+</section>
+
 
 
     <!-- STUDENTS SECTION -->
